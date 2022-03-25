@@ -128,7 +128,7 @@ void RBtree::corregirArbol(Nodo* &puntero){
                 setColor(padre ,BLACK);
                 setColor(tio   ,BLACK);
                 setColor(abuelo,RED  );
-                puntero = padre;
+                puntero = abuelo;
             }
             else{
                 // CASO II: padre y el hijo tienen distintas direcciones
@@ -154,7 +154,7 @@ void RBtree::corregirArbol(Nodo* &puntero){
                 setColor(padre ,BLACK);
                 setColor(tio   ,BLACK);
                 setColor(abuelo,RED  );
-                puntero = padre;
+                puntero = abuelo;
             }
             else{
                 // CASO II: padre y el hijo tienen distintas direcciones
@@ -171,6 +171,8 @@ void RBtree::corregirArbol(Nodo* &puntero){
             }
         }
     }
+
+    setColor(root,BLACK);
     
 }
 
