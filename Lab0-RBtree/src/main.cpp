@@ -21,8 +21,9 @@ int main() {
   rb.insert(9);
 
   /* Lookup */
-  if(rb.isPresent(5)) std::cout << "5 está presente\n";
-  if(!rb.isPresent(10)) std::cout << "10 no está presente\n";
+  if(rb.contains(5)) std::cout << "5 está presente\n";
+  if(rb.contains(9)) std::cout << "9 está presente\n";
+  if(!rb.contains(10)) std::cout << "10 no está presente\n";
 
   /* Iteration */
   auto print = [](int const& k){ std::cout << k << " ";};

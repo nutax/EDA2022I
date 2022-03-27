@@ -28,6 +28,7 @@ struct Node{K k; ID p,l,r; COL c;};
 /* Constants */
 constexpr static ID initial_capacity = 512;
 constexpr static ID null = ((1 << (sizeof(ID)*8 - 2) - 1) * 2) + 1;
+constexpr static ID nil = 0;
 
 
 /* Memory */
@@ -52,7 +53,7 @@ void deleteNode(ID current){
   mem.pop_back(); 
 }
 
-void updateParent(ID parent, ID old_child, ID new_child){
+void changeChild(ID parent, ID old_child, ID new_child){
   if (parent == null) root = new_child;
   else if (LEFT(parent) == old_child) LEFT(parent) = new_child;
   else RIGHT(parent) = new_child;
@@ -72,7 +73,7 @@ void rotateRight(ID current){
   RIGHT(left) = current;
   PARENT(current) = left;
 
-  updateParent(parent, current, left);
+  changeChild(parent, current, left);
 }
 
 void rotateLeft(ID current){
@@ -87,7 +88,7 @@ void rotateLeft(ID current){
   LEFT(right) = current;
   PARENT(current) = right;
 
-  updateParent(parent, current, right);
+  changeChild(parent, current, right);
 }
 
 ID searchNode(K const& k){
@@ -153,11 +154,34 @@ void forEachPos_r(std::function<void(K const&)> f, ID current){
   forEachPos_r(f, LEFT(current)); forEachPos_r(f, RIGHT(current)); f(KEY(current));
 }
 
+ID eraseWithSingleChild(ID current){
+  ID promoted;
+  
+  if(LEFT(current) != null){
+    changeChild(PARENT(current), current, LEFT(current));
+    promoted = LEFT(current);
+  } // Tiene hijo izquierdo
+
+  else if (RIGHT(current) != null){
+    changeChild(PARENT(current), current, RIGHT(current));
+    promoted = RIGHT(current);
+  } // Tiene hijo derecho
+
+  else{
+    ID new_child = (COLOR(current) == BLACK) ? nil : null;
+    changeChild(PARENT(current), current, new_child);
+    promoted = new_child;
+  } // No tiene hijos
+
+  deleteNode(current);
+  return promoted;
+}
 
 
 /* Interface */
 public:
 RBtree(){
+  mem.push_back({K{}, null, null, null, BLACK});
   mem.reserve(initial_capacity);
 }
 
@@ -189,32 +213,33 @@ void erase(K const& k){
 
   if(current == null) return; //No existe
 
-  ID moved;
+  ID promoted;
   COL color;
   
   if(LEFT(current) == null || RIGHT(current) == null){
-    moved = eraseNodeSingleChild(current);
+    promoted = eraseWithSingleChild(current);
     color = COLOR(current);
   } //Tiene a lo sumo un hijo
 
   else{
     ID successor = findMinimun(RIGHT(current));
     KEY(current) = KEY(successor);
-    moved = eraseNodeSingleChild(successor);
+    promoted = eraseWithSingleChild(successor);
     color = COLOR(successor);
   } //Tiene dos hijos
 
   if(color == BLACK){
-    fixErasure(moved);
-    if(move )
-  }
+    fixErasure(promoted);
+    if(promoted == nil){
+      changeChild(PARENT(promoted), promoted, null);
+    }
+  }// Nodo eliminado es negro
 }
 
-bool isPresent(K const& k){
+bool contains(K const& k){
   ID current = root;
 
   while (current != null){
-    int a;
     if (k < KEY(current)) current = LEFT(current);
     else if (k > KEY(current)) current = RIGHT(current);
     else return true; 
@@ -236,7 +261,8 @@ void forEachPos(std::function<void(K const&)> f){
 }
 
 void forEachFast(std::function<void(K const&)> f){
-  for(auto const& mem_node : mem) f(mem_node.k);
+  const ID size = mem.size();
+  for(ID id = 1; id<size; ++id) f(KEY(id));
 }
 
 };
