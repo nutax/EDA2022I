@@ -93,9 +93,9 @@ void rotateLeft(ID current){
 ID searchNode(K const& k){
   ID current = root;
   while (current != null){
-    if(k == KEY(current)) return current;
-    else if(k < KEY(current)) current = LEFT(current);
-    else current = RIGHT(current);
+    if(k < KEY(current)) current = LEFT(current);
+    else if (k > KEY(current)) current = RIGHT(current);
+    else return current;
   }
   return null;
 }
@@ -185,7 +185,29 @@ void insert(K const& k){
 }
 
 void erase(K const& k){
+  ID current = searchNode(k);
+
+  if(current == null) return; //No existe
+
+  ID moved;
+  COL color;
   
+  if(LEFT(current) == null || RIGHT(current) == null){
+    moved = eraseNodeSingleChild(current);
+    color = COLOR(current);
+  } //Tiene a lo sumo un hijo
+
+  else{
+    ID successor = findMinimun(RIGHT(current));
+    KEY(current) = KEY(successor);
+    moved = eraseNodeSingleChild(successor);
+    color = COLOR(successor);
+  } //Tiene dos hijos
+
+  if(color == BLACK){
+    fixErasure(moved);
+    if(move )
+  }
 }
 
 bool isPresent(K const& k){
