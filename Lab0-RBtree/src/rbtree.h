@@ -111,17 +111,17 @@ void fixInsertion(ID current){
     if(current == RIGHT(parent)){
       rotateLeft(parent);
       parent = current;
-    }
+    } // Caso triangulo con punta hacia izquierda
     rotateRight(grandparent); //Caso linea recta creciente
-  } // Caso triangulo con punta hacia izquierda
+  } 
 
   else{
     if(current == LEFT(parent)){
       rotateRight(parent);
       parent = current;
-    }
+    } // Caso triangulo con punta hacia derecha
     rotateLeft(grandparent); //Caso linea recta decreciente
-  } // Caso triangulo con punta hacia derecha
+  } 
 
   COLOR(parent) = BLACK; COLOR(grandparent) = RED;
 } 

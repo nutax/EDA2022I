@@ -12,6 +12,12 @@ int main() {
   r.insert(2);
   r.insert(6);
   r.insert(4);
-  if(r.isPresent(5)) std::cout << "Hello World!\n";
+  r.insert(1);
+  r.insert(0);
+  r.insert(7);
+  r.insert(8);
+  r.insert(9);
+  if(r.isPresent(5)) std::cout << "5 está presente\n";
+  if(r.isPresent(10)) std::cout << "10 no está presente\n";
   return 0;
 }
