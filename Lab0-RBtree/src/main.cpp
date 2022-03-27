@@ -18,6 +18,6 @@ int main() {
   r.insert(8);
   r.insert(9);
   if(r.isPresent(5)) std::cout << "5 está presente\n";
-  if(r.isPresent(10)) std::cout << "10 no está presente\n";
+  if(!r.isPresent(10)) std::cout << "10 no está presente\n";
   return 0;
 }
