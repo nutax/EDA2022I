@@ -16,11 +16,12 @@
 
 /* 5 parts: Types, Constants, Memory, Internal procedures, Interface */
 
+template<typename K>
 class RBtree{
 
 /* Types */
-using K = int;
-using ID = int;
+//using K = int;
+using ID = unsigned;
 using COL = bool;
 struct Node{K k; ID p,l,r; COL c;};
 
