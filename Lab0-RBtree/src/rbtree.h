@@ -13,6 +13,8 @@
 #define RED 0
 #define BLACK 1
 
+#define IS_BLACK(id) (id == null || COLOR(id) = BLACK)
+
 /* 5 parts: Types, Constants, Memory, Internal procedures, Interface */
 
 template<typename K>
@@ -201,7 +203,7 @@ void fixErasure(ID current){
   } // Hermano es rojo
 
 
-  if( (LEFT(sibling) == null || LEFT(sibling) == BLACK) && (RIGHT(sibling) == null || RIGHT(sibling) == BLACK)){
+  if(IS_BLACK(LEFT(sibling)) && IS_BLACK(RIGHT(sibling))){
 
     if(COLOR(PARENT(current)) == RED) COLOR(PARENT(current)) = BLACK; // Hermano negro con hijos negros y padre rojo
     else fixErasure(PARENT(current)); // Hermano negro con hijos negros y padre negro
@@ -211,8 +213,35 @@ void fixErasure(ID current){
   else {
     bool is_left = current == LEFT(PARENT(current));
     
+    if(is_left){
+      if(IS_BLACK(RIGHT(sibling))){
+        COLOR(LEFT(sibling)) = BLACK;
+        COLOR(sibling) = RED;
+        rotateRight(sibling);
+        sibling = RIGHT(PARENT(current));
+      }
+    }else {
+      if(IS_BLACK(LEFT(sibling))){
+        COLOR(RIGHT(sibling)) = BLACK;
+        COLOR(sibling) = RED;
+        rotateLeft(sibling);
+        sibling = LEFT(PARENT(current));
+      }
+    } // Hermano negro con un hijo rojo y otro negro hacia afuera
+
+    COLOR(sibling) = COLOR(PARENT(current));
+    COLOR(PARENT(current)) = BLACK;
+    if(is_left){
+      COLOR(RIGHT(sibling)) = BLACK;
+      rotateLeft(PARENT(current));
+    }else{
+      COLOR(LEFT(sibling)) = BLACK;
+      rotateRight(PARENT(current));
+    }
+
   } // Hermano negro con al menos un hijo rojo
 }
+
 
 
 /* Interface */
