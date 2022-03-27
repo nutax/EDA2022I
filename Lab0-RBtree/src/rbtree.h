@@ -9,7 +9,6 @@
 #define LEFT(id) mem[id].l
 #define KEY(id) mem[id].k
 #define COLOR(id) mem[id].c
-#define UNCLE (LEFT(grandparent) == parent) ? RIGHT(grandparent) : LEFT(grandparent)
 
 #define RED 0
 #define BLACK 1
@@ -111,7 +110,7 @@ void fixInsertion(ID current){
   ID grandparent = PARENT(parent);
   if(grandparent == null) {COLOR(parent) = BLACK; return;} //Padre es root y rojo
 
-  ID uncle = UNCLE;
+  ID uncle = (LEFT(grandparent) == parent) ? RIGHT(grandparent) : LEFT(grandparent);
 
   if(uncle != null && COLOR(uncle) == RED){
     COLOR(parent) = BLACK; COLOR(grandparent) = RED; COLOR(uncle) = BLACK;
@@ -156,7 +155,7 @@ void forEachPos_r(std::function<void(K const&)> f, ID current){
 
 ID eraseWithSingleChild(ID current){
   ID promoted;
-  
+
   if(LEFT(current) != null){
     changeChild(PARENT(current), current, LEFT(current));
     promoted = LEFT(current);
@@ -177,12 +176,50 @@ ID eraseWithSingleChild(ID current){
   return promoted;
 }
 
+ID smallest(ID current){
+  while(LEFT(current) != null){
+    current = LEFT(current);
+  }
+  return current;
+}
+
+void fixErasure(ID current){
+  if(current == root) return; // Es root
+
+
+  ID sibling = (current == LEFT(PARENT(current))) ? RIGHT(PARENT(current)) : LEFT(PARENT(current));
+
+
+  if(COLOR(sibling) == RED){
+    COLOR(sibling) = BLACK;
+    COLOR(PARENT(current)) = RED;
+
+    if(current == LEFT(PARENT(current))) rotateLeft(PARENT(current));
+    else rotateRight(current);
+
+    sibling = (current == LEFT(PARENT(current))) ? RIGHT(PARENT(current)) : LEFT(PARENT(current));
+  } // Hermano es rojo
+
+
+  if( (LEFT(sibling) == null || LEFT(sibling) == BLACK) && (RIGHT(sibling) == null || RIGHT(sibling) == BLACK)){
+
+    if(COLOR(PARENT(current)) == RED) COLOR(PARENT(current)) = BLACK; // Hermano negro con hijos negros y padre rojo
+    else fixErasure(PARENT(current)); // Hermano negro con hijos negros y padre negro
+
+  } //Hermano negro con hijos negros
+
+  else {
+    bool is_left = current == LEFT(PARENT(current));
+    
+  } // Hermano negro con al menos un hijo rojo
+}
+
 
 /* Interface */
 public:
 RBtree(){
-  mem.push_back({K{}, null, null, null, BLACK});
   mem.reserve(initial_capacity);
+  mem.push_back({K{}, null, null, null, BLACK});
 }
 
 ~RBtree(){}
@@ -222,7 +259,7 @@ void erase(K const& k){
   } //Tiene a lo sumo un hijo
 
   else{
-    ID successor = findMinimun(RIGHT(current));
+    ID successor = smallest(RIGHT(current));
     KEY(current) = KEY(successor);
     promoted = eraseWithSingleChild(successor);
     color = COLOR(successor);
