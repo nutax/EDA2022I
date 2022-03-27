@@ -19,5 +19,13 @@ int main() {
   r.insert(9);
   if(r.isPresent(5)) std::cout << "5 está presente\n";
   if(!r.isPresent(10)) std::cout << "10 no está presente\n";
+
+  auto print = [](int const& k){ std::cout << k << " ";};
+  std::cout << "\nPreorder: "; r.forEachPre(print);
+  std::cout << "\nInorder: "; r.forEachIn(print);
+  std::cout << "\nPostorder: "; r.forEachPos(print);
+  std::cout << "\nFast (no order): "; r.forEachFast(print);
+  std::cout << "\n\n";
+
   return 0;
 }

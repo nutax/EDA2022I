@@ -124,7 +124,23 @@ void fixInsertion(ID current){
   } 
 
   COLOR(parent) = BLACK; COLOR(grandparent) = RED;
-} 
+}
+
+
+void forEachIn_r(std::function<void(K const&)> f, ID current){
+  if(current == null) return;
+  forEachIn_r(f, LEFT(current)); f(KEY(current)); forEachIn_r(f, RIGHT(current));
+}
+
+void forEachPre_r(std::function<void(K const&)> f, ID current){
+  if(current == null) return;
+  f(KEY(current)); forEachPre_r(f, LEFT(current)); forEachPre_r(f, RIGHT(current));
+}
+
+void forEachPos_r(std::function<void(K const&)> f, ID current){
+  if(current == null) return;
+  forEachPos_r(f, LEFT(current)); forEachPos_r(f, RIGHT(current)); f(KEY(current));
+}
 
 
 
@@ -175,19 +191,19 @@ bool isPresent(K const& k){
 }
 
 void forEachIn(std::function<void(K const&)> f){
-  
+  forEachIn_r(f, root);
 }
 
 void forEachPre(std::function<void(K const&)> f){
-  
+  forEachPre_r(f, root);
 }
 
 void forEachPos(std::function<void(K const&)> f){
-  
+  forEachPos_r(f, root);
 }
 
 void forEachFast(std::function<void(K const&)> f){
-  
+  for(auto const& mem_node : mem) f(mem_node.k);
 }
 
 };
