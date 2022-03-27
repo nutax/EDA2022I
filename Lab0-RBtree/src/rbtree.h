@@ -37,9 +37,19 @@ std::vector<Node> mem;
 
 /* Internal procedures */
 int newNode(K const& k){
-  const int i = mem.size();
+  const ID new_id = mem.size();
   mem.push_back({k, null, null, null, RED});
-  return i;
+  return new_id;
+}
+
+void deleteNode(ID current){
+  const ID last = mem.size() - 1;
+  const ID parent = PARENT(last), left = LEFT(last), right = RIGHT(last);
+  if(parent != null)if(last == LEFT(parent)) LEFT(parent) = current; else RIGHT(parent) = current;
+  if(left != null) PARENT(left) = current;
+  if(right != null) PARENT(right) = current;
+  mem[current] = mem[last];
+  mem.pop_back(); 
 }
 
 void updateParent(ID parent, ID old_child, ID new_child){

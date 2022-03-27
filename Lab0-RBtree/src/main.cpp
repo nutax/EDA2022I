@@ -7,7 +7,7 @@
 
 int main() {
   RBtree<int> rb;
-  
+
   /* Insertion */
   rb.insert(5);
   rb.insert(3);
@@ -19,6 +19,8 @@ int main() {
   rb.insert(7);
   rb.insert(8);
   rb.insert(9);
+
+  /* Lookup */
   if(rb.isPresent(5)) std::cout << "5 está presente\n";
   if(!rb.isPresent(10)) std::cout << "10 no está presente\n";
 
