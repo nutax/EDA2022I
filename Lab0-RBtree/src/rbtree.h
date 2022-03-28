@@ -12,6 +12,11 @@
 //-----------------------------------------------------------------------------------------------------------------//
 
 
+//-----------------------------------------------------------------------------------------------------------------//
+/* REFLEXIÓN: Si lo volviera a implementar o tuviera más tiempo, lo haría iterativo: es más rápido y sencillo.
+              Lamentablemente me di cuenta tarde. */
+//-----------------------------------------------------------------------------------------------------------------//
+
 /* 
 Métodos públicos (Interfaz)
   1. insert
@@ -75,7 +80,7 @@ int newNode(K const& k){
 }
 
 // Se busca que los nodos esten compactos en memoria para facilitar su gestion
-// Si se elimina un nodo se sustituye el último elemento por este y se elimina el último.
+// Si se elimina un nodo se sustituye por el último elemento y se elimina el último.
 void deleteNode(ID current){
   const ID last = mem.size() - 1;
   if(last != current){
@@ -144,12 +149,12 @@ ID searchNode(K const& k){
 void fixInsertion(ID current){
   ID parent = PARENT(current);
 
-  if(parent == null) return; //Es root
+  if(parent == null) return; //Es root, no pasa nada
 
-  if(COLOR(parent) == BLACK) return; //Padre es negro
+  if(COLOR(parent) == BLACK) return; //Padre es negro, no pasa nada
 
   ID grandparent = PARENT(parent);
-  if(grandparent == null) {COLOR(parent) = BLACK; return;} //Padre es root y rojo
+  if(grandparent == null) {COLOR(parent) = BLACK; return;} //Padre es root y rojo, se cambia a negro
 
   ID uncle = (LEFT(grandparent) == parent) ? RIGHT(grandparent) : LEFT(grandparent);
 
@@ -210,7 +215,7 @@ ID eraseWithSingleChild(ID current){
   } // Tiene hijo derecho
 
   else{
-    ID new_child = (COLOR(current) == BLACK) ? nil : null;
+    ID new_child = (COLOR(current) == BLACK) ? nil : null; //No tiene hijos y es negro: su nuevo hijo es nil, un nodo comodin para hacer la eliminación más sencilla
     changeChild(PARENT(current), current, new_child);
     promoted = new_child;
   } // No tiene hijos
@@ -227,9 +232,9 @@ ID smallest(ID current){
   return current;
 }
 
-//Para corregir la eliminación, depende del hermano
+//Para corregir la eliminación: depende del hermano
 void fixErasure(ID current){
-  if(current == root) return; // Es root
+  if(current == root) return; // Es root: no pasa nada
 
 
   ID sibling = (current == LEFT(PARENT(current))) ? RIGHT(PARENT(current)) : LEFT(PARENT(current));
@@ -243,14 +248,14 @@ void fixErasure(ID current){
     else rotateRight(current);
 
     sibling = (current == LEFT(PARENT(current))) ? RIGHT(PARENT(current)) : LEFT(PARENT(current));
-  } // Hermano es rojo
+  } // Hermano es rojo: se cambia el hermano a negro y se rota el padre hacia el actual
 
 
   if(IS_BLACK(LEFT(sibling)) && IS_BLACK(RIGHT(sibling))){
     COLOR(sibling) = RED;
 
-    if(COLOR(PARENT(current)) == RED) COLOR(PARENT(current)) = BLACK; // Hermano negro con hijos negros y padre rojo
-    else fixErasure(PARENT(current)); // Hermano negro con hijos negros y padre negro
+    if(COLOR(PARENT(current)) == RED) COLOR(PARENT(current)) = BLACK; // Hermano negro con hijos negros y padre rojo: se cambia el padre a negro
+    else fixErasure(PARENT(current)); // Hermano negro con hijos negros y padre negro: se corrige la eliminación recursivamente
 
   } //Hermano negro con hijos negros
 
@@ -263,14 +268,14 @@ void fixErasure(ID current){
         COLOR(sibling) = RED;
         rotateRight(sibling);
         sibling = RIGHT(PARENT(current));
-      }
+      } // Actual es hijo izquierdo y el hijo derecho del hermano es negro: su hijo izquierdo se vuelve negro, el hermano rojo y se rota el hacia su hijo inicialmente negro
     }else {
       if(IS_BLACK(LEFT(sibling))){
         COLOR(RIGHT(sibling)) = BLACK;
         COLOR(sibling) = RED;
         rotateLeft(sibling);
         sibling = LEFT(PARENT(current));
-      }
+      } // Actual es hijo derecho y el hijo izquierdp del hermano es negro: su hijo derecho se vuelve negro, el hermano rojo y se rota el hacia su hijo inicialmente negro
     } // Hermano negro con un hijo rojo y otro negro hacia afuera
 
     COLOR(sibling) = COLOR(PARENT(current));
@@ -316,11 +321,11 @@ void insert(K const& k){
   PARENT(current) = parent;
 
   fixInsertion(current);
-  COLOR(root) = BLACK;
+  //COLOR(root) = BLACK; //No es indispensable
 }
 
 void erase(K const& k){
-  ID current = searchNode(k);
+  ID current = searchNode(k); //Busqueda de BST
 
   if(current == null) return; //No existe
 
@@ -330,23 +335,23 @@ void erase(K const& k){
   if(LEFT(current) == null || RIGHT(current) == null){
     color = COLOR(current);
     promoted = eraseWithSingleChild(current);
-  } //Tiene a lo sumo un hijo
+  } //Tiene a lo sumo un hijo: se reemplaza por su hijo
 
   else{
     ID successor = smallest(RIGHT(current));
     color = COLOR(successor);
     KEY(current) = KEY(successor);
     promoted = eraseWithSingleChild(successor);
-  } //Tiene dos hijos
+  } //Tiene dos hijos: se reemplaza por su sucesor en orden
 
   if(color == BLACK){
     fixErasure(promoted);
     if(promoted == nil){
       changeChild(PARENT(promoted), promoted, null);
     }
-  }// Nodo eliminado es negro
+  }// Nodo eliminado es negro: se ajusta la eliminación
 
-  COLOR(root) = BLACK;
+  //COLOR(root) = BLACK; //No es indispensable
 }
 
 bool contains(K const& k){
