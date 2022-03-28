@@ -3,6 +3,14 @@
 #include <functional>
 
 /* By José Ignacio Huby Ochoa */
+/* La teoria y el algoritmo se baso de https://www.happycoders.eu/algorithms/red-black-tree-java */
+/* Pero NO se copio el código, solo se uso de referencia. */
+
+
+//-----------------------------------------------------------------------------------------------------------------//
+/* IMPORTANTE: Las reglas se estiran y se incumplehn en algunos casos, pero la funcionalidad termina siendo igual */
+//-----------------------------------------------------------------------------------------------------------------//
+
 
 /* 
 Métodos públicos (Interfaz)
@@ -20,6 +28,7 @@ Métodos públicos (Interfaz)
   12. forEachFast
 */
 
+//La explicacion de estos macros esta en la sección de memoria, más abajo
 #define PARENT(id) mem[id].p
 #define RIGHT(id) mem[id].r
 #define LEFT(id) mem[id].l
@@ -39,26 +48,34 @@ class RBtree{
 using K = int; //Para reemplazar con facilidad o sustituirlo por un Template
 using ID = unsigned; // Para sustituir el uso de punteros y por posiciones relativas en un vector
 using COL = bool; // Para señalar el color de un nodo
-struct Node{K k; ID p,l,r; COL c;};
+struct Node{K k; ID p,l,r; COL c;}; //Estructura del nodo
 
 /* Constants */
-constexpr static ID initial_capacity = 512;
-constexpr static ID null = ((1 << (sizeof(ID)*8 - 2) - 1) * 2) + 1;
-constexpr static ID nil = 0; 
+constexpr static ID initial_capacity = 512; // Se alloca esta cantidad de nodos iniciales para evitar reallocaciones
+constexpr static ID null = ((1 << (sizeof(ID)*8 - 2) - 1) * 2) + 1; //Sustituto de nullptr para usar propio manejo de memoria
+constexpr static ID nil = 0; //Referncia a un nodo especial (ubicado en la posicion 0 del vector) para poder realizar la eliminación correctamente
 
 
-/* Memory */
-ID root = null;
+/* Memory */ 
+// En esta implementacion busco reducir la cantidad de peticiones al sistema operativo para allocar memoria
+// Para ello, utilizo un vector como una forma rapida y simple de tener mi propia gestion de memoria
+// Los índices del vector son mis punteros. En lugar de hacer ptr->k, se utiliza como mem[id].k
+// Para facilitar la escritura se crearon macros.
+ID root = null; 
 std::vector<Node> mem;
 
 
 /* Internal procedures */
+
+// La dirección relativa de un nuevo nodo es la posición final del vector
 int newNode(K const& k){
   const ID new_id = mem.size();
   mem.push_back({k, null, null, null, RED});
   return new_id;
 }
 
+// Se busca que los nodos esten compactos en memoria para facilitar su gestion
+// Si se elimina un nodo se sustituye el último elemento por este y se elimina el último.
 void deleteNode(ID current){
   const ID last = mem.size() - 1;
   if(last != current){
@@ -71,6 +88,7 @@ void deleteNode(ID current){
   mem.pop_back(); 
 }
 
+// Para cambiar un hijo por otro
 void changeChild(ID parent, ID old_child, ID new_child){
   if (parent == null) root = new_child;
   else if (LEFT(parent) == old_child) LEFT(parent) = new_child;
@@ -79,6 +97,7 @@ void changeChild(ID parent, ID old_child, ID new_child){
   if(new_child != null) PARENT(new_child) = parent;
 }
 
+// Para rotar a la derecha como en un BST
 void rotateRight(ID current){
   ID parent = PARENT(current);
   ID left = LEFT(current);
@@ -94,6 +113,7 @@ void rotateRight(ID current){
   changeChild(parent, current, left);
 }
 
+// Para rotar a la izquierda como en un BST
 void rotateLeft(ID current){
   ID parent = PARENT(current);
   ID right = RIGHT(current);
@@ -109,6 +129,7 @@ void rotateLeft(ID current){
   changeChild(parent, current, right);
 }
 
+// Para buscar como en BST
 ID searchNode(K const& k){
   ID current = root;
   while (current != null){
@@ -119,6 +140,7 @@ ID searchNode(K const& k){
   return null;
 }
 
+//Para corregir la inserción, depende del tio
 void fixInsertion(ID current){
   ID parent = PARENT(current);
 
@@ -172,6 +194,8 @@ void forEachPos_r(std::function<void(K const&)> f, ID current){
   forEachPos_r(f, LEFT(current)); forEachPos_r(f, RIGHT(current)); f(KEY(current));
 }
 
+//Se elimina el nodo específico como en un BST cuando tiene a lo sumo un hijo
+// Se reemplaza por alguno de sus hijos
 ID eraseWithSingleChild(ID current){
   ID promoted;
 
@@ -195,6 +219,7 @@ ID eraseWithSingleChild(ID current){
   return promoted;
 }
 
+//Sucesor inorder
 ID smallest(ID current){
   while(LEFT(current) != null){
     current = LEFT(current);
@@ -202,6 +227,7 @@ ID smallest(ID current){
   return current;
 }
 
+//Para corregir la eliminación, depende del hermano
 void fixErasure(ID current){
   if(current == root) return; // Es root
 

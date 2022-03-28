@@ -50,6 +50,7 @@ int main() {
   rb.erase(8);
   rb.erase(1);
   rb.erase(7);
+  rb.erase(5);
 
   /* Iteration */
   auto print = [](int const& k){ std::cout << k << " ";};
@@ -83,6 +84,7 @@ int main() {
   rb.eliminarNodo(8);
   rb.eliminarNodo(1);
   rb.eliminarNodo(7);
+  rb.eliminarNodo(5);
 
   /* Iteration */
   const auto inorder = rb.inorden();
