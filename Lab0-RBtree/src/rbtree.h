@@ -13,7 +13,7 @@
 #define RED 0
 #define BLACK 1
 
-#define IS_BLACK(id) (id == null || COLOR(id) = BLACK)
+#define IS_BLACK(id) (id == null || COLOR(id) == BLACK)
 
 /* 5 parts: Types, Constants, Memory, Internal procedures, Interface */
 
@@ -283,15 +283,15 @@ void erase(K const& k){
   COL color;
   
   if(LEFT(current) == null || RIGHT(current) == null){
-    promoted = eraseWithSingleChild(current);
     color = COLOR(current);
+    promoted = eraseWithSingleChild(current);
   } //Tiene a lo sumo un hijo
 
   else{
     ID successor = smallest(RIGHT(current));
+    color = COLOR(successor);
     KEY(current) = KEY(successor);
     promoted = eraseWithSingleChild(successor);
-    color = COLOR(successor);
   } //Tiene dos hijos
 
   if(color == BLACK){
