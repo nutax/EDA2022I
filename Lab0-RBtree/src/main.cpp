@@ -48,6 +48,8 @@ int main() {
   /* Erasure */
   rb.erase(4);
   rb.erase(8);
+  rb.erase(1);
+  rb.erase(7);
 
   /* Iteration */
   auto print = [](int const& k){ std::cout << k << " ";};
@@ -61,6 +63,8 @@ int main() {
 
 
   /* Ejemplo con métodos con nombres solicitados */
+
+  rb = RBtree{};
 
   /* Insertion */
   rb.insertar(5);
@@ -77,14 +81,17 @@ int main() {
   /* Erasure */
   rb.eliminarNodo(4);
   rb.eliminarNodo(8);
+  rb.eliminarNodo(1);
+  rb.eliminarNodo(7);
 
   /* Iteration */
   const auto inorder = rb.inorden();
   const auto preorder = rb.preorden();
   const auto posorder = rb.posorden();
-  std::cout << "\nPreorder: ";for(auto const& k : inorder) std::cout << k << " ";
-  std::cout << "\nInorder: "; for(auto const& k : preorder) std::cout << k << " ";
+  std::cout << "\nPreorder: ";for(auto const& k : preorder) std::cout << k << " ";
+  std::cout << "\nInorder: "; for(auto const& k : inorder) std::cout << k << " ";
   std::cout << "\nPostorder: "; for(auto const& k : posorder) std::cout << k << " ";
   std::cout << "\n\n";
+
   return 0;
 }

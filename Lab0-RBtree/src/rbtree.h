@@ -33,18 +33,18 @@ Métodos públicos (Interfaz)
 
 /* 5 parts: Types, Constants, Memory, Internal procedures, Interface */
 
-//template<typename K>
+//template<typename K> // Descomentar y comentar using K, para usar Templates
 class RBtree{
 
-using K = int;
-using ID = unsigned;
-using COL = bool;
+using K = int; //Para reemplazar con facilidad o sustituirlo por un Template
+using ID = unsigned; // Para sustituir el uso de punteros y por posiciones relativas en un vector
+using COL = bool; // Para señalar el color de un nodo
 struct Node{K k; ID p,l,r; COL c;};
 
 /* Constants */
 constexpr static ID initial_capacity = 512;
 constexpr static ID null = ((1 << (sizeof(ID)*8 - 2) - 1) * 2) + 1;
-constexpr static ID nil = 0;
+constexpr static ID nil = 0; 
 
 
 /* Memory */
@@ -221,6 +221,7 @@ void fixErasure(ID current){
 
 
   if(IS_BLACK(LEFT(sibling)) && IS_BLACK(RIGHT(sibling))){
+    COLOR(sibling) = RED;
 
     if(COLOR(PARENT(current)) == RED) COLOR(PARENT(current)) = BLACK; // Hermano negro con hijos negros y padre rojo
     else fixErasure(PARENT(current)); // Hermano negro con hijos negros y padre negro
@@ -289,6 +290,7 @@ void insert(K const& k){
   PARENT(current) = parent;
 
   fixInsertion(current);
+  COLOR(root) = BLACK;
 }
 
 void erase(K const& k){
@@ -317,6 +319,8 @@ void erase(K const& k){
       changeChild(PARENT(promoted), promoted, null);
     }
   }// Nodo eliminado es negro
+
+  COLOR(root) = BLACK;
 }
 
 bool contains(K const& k){
