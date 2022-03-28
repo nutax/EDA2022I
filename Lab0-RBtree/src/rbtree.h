@@ -4,6 +4,22 @@
 
 /* By José Ignacio Huby Ochoa */
 
+/* 
+Métodos públicos (Interfaz)
+  1. insert
+  2. insertar (llama insert)
+  3. erase
+  4. eliminarNodo (llama erase)
+  5. contains
+  6. forEachIn
+  7. inorder (llama forEachIn -> vector)
+  8. forEachPre
+  9. preorder (llama forEachPre -> vector)
+  10. forEachPos
+  11. posorder (llama forEachPos -> vector)
+  12. forEachFast
+*/
+
 #define PARENT(id) mem[id].p
 #define RIGHT(id) mem[id].r
 #define LEFT(id) mem[id].l
@@ -17,11 +33,10 @@
 
 /* 5 parts: Types, Constants, Memory, Internal procedures, Interface */
 
-template<typename K>
+//template<typename K>
 class RBtree{
 
-/* Types */
-//using K = int;
+using K = int;
 using ID = unsigned;
 using COL = bool;
 struct Node{K k; ID p,l,r; COL c;};
@@ -329,6 +344,35 @@ void forEachPos(std::function<void(K const&)> f){
 void forEachFast(std::function<void(K const&)> f){
   const ID size = mem.size();
   for(ID id = 1; id<size; ++id) f(KEY(id));
+}
+
+inline void insertar(K const& k){
+  insert(k);
+}
+
+inline void eliminarNodo(K const& k){
+  erase(k);
+}
+
+inline std::vector<K> inorden(){
+  std::vector<K> vec;
+  vec.reserve(mem.size());
+  forEachIn_r([&vec](K const& k) {vec.push_back(k);}, root);
+  return vec;
+}
+
+inline std::vector<K> preorden(){
+  std::vector<K> vec;
+  vec.reserve(mem.size());
+  forEachPre_r([&vec](K const& k) {vec.push_back(k);}, root);
+  return vec;
+}
+
+inline std::vector<K> posorden(){
+  std::vector<K> vec;
+  vec.reserve(mem.size());
+  forEachPos_r([&vec](K const& k) {vec.push_back(k);}, root);
+  return vec;
 }
 
 };
