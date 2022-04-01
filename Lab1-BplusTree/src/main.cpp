@@ -21,10 +21,10 @@ int main() {
 
     int64_t tiempoInseccion = 0;
     for (int t=0; t<10; ++t){
-        auto tree = BplusTree();
+        auto tree = BplusTree{};
         
         std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-        for (int i=0; i<1000000; ++i){
+        for (int i=0; i<10; ++i){
             tree.insertar( datos[i] );
         }
         std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
@@ -33,5 +33,5 @@ int main() {
         auto tiempo = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
         tiempoInseccion += tiempo;
     }
-    
+    std::cout << tiempoInseccion << std::endl;
 }

@@ -1,4 +1,1 @@
-
-class BplusTree{
-    
-};
+/*Hice todo en el .h*/
