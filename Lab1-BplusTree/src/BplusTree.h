@@ -23,7 +23,7 @@ class BplusTree{
     using Index = uint32_t;
     using Size = uint32_t;
 
-    static constexpr Index null = UINT32_MAX;
+    static constexpr Index null = 0;
     static constexpr Size degree = 4;
     static constexpr Size capacity = degree-1;
     static constexpr Size mid = degree/2;
@@ -31,7 +31,7 @@ class BplusTree{
     struct Node{
         Size size;
         Key key[capacity+1];
-        Index child[degree+1];
+        Index child[degree+1] = {0};
         Index parent;
     };
 
@@ -44,7 +44,8 @@ class BplusTree{
     public:
     BplusTree(){
         root = null;
-        mem.reserve(1024*128);
+        mem.reserve(128);
+        mem.emplace_back();
     }
 
     ~BplusTree(){}
@@ -54,7 +55,6 @@ class BplusTree{
             root = NEW_NODE;
             SIZE(root) = 1;
             KEY(root, 0) = key;
-            CHILD(root, 0) = null;
             PARENT(root) = null;
             return;
         }
@@ -94,7 +94,6 @@ class BplusTree{
         Index other_half = NEW_NODE;
         SIZE(other_half) = degree - mid;
         memcpy(&(KEY(other_half,0)), &(KEY(current,mid)), sizeof(Key)*(degree - mid));
-        CHILD(other_half, 0) = null;
         PARENT(other_half) = PARENT(current);
         int dummy;
         do{
@@ -127,7 +126,7 @@ class BplusTree{
 
             SIZE(current) = mid;
             other_half = NEW_NODE;
-            SIZE(other_half) = degree - mid;
+            SIZE(other_half) = degree - mid - 1;
             memcpy(&(KEY(other_half,0)), &(KEY(current,mid+1)), sizeof(Key)*(degree - mid - 1));
             memcpy(&(CHILD(other_half,0)), &(CHILD(current,mid+1)), sizeof(Index)*(degree - mid));
             PARENT(other_half) = PARENT(current);
@@ -149,9 +148,10 @@ class BplusTree{
                 if(CHILD(current, i) != null) q.push(CHILD(current, i));
             }
             for(int i = 0; i<SIZE(current); ++i){
-                std::cout << KEY(root, i) << ' ';
+                std::cout << KEY(current, i) << ' ';
             }
             std::cout<<std::endl;
+            q.pop();
         }
     }
 };

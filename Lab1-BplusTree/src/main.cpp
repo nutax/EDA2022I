@@ -26,7 +26,7 @@ int main() {
         auto tree = BplusTree{};
         
         std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-        for (uint32_t i=1; i<11; ++i){
+        for (uint32_t i=1; i<22; ++i){
             tree.insertar( i );
         }
         std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
