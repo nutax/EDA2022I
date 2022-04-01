@@ -3,6 +3,7 @@
 #include <fstream>
 #include <chrono>
 
+
 int main() {
 
 
@@ -30,12 +31,11 @@ int main() {
             tree.insertar( i );
         }
         std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-        std::cout << tree.nodes() << std::endl;
         // Calcular tiempo
         auto tiempo = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
         tiempoInseccion += tiempo;
-        //tree.bfs();
     }
     std::cout << tiempoInseccion << std::endl;
 
 }
+

@@ -24,7 +24,7 @@ class BplusTree{
     using Size = uint32_t;
 
     static constexpr Index null = 0;
-    static constexpr Size degree = 4;
+    static constexpr Size degree = 5; //Muchisimo mas rapido con grado 6
     static constexpr Size capacity = degree-1;
     static constexpr Size mid = degree/2;
     
@@ -38,6 +38,9 @@ class BplusTree{
 
     Index root;
     std::vector<Node> mem;
+
+
+    
 
 
 
@@ -61,22 +64,12 @@ class BplusTree{
         
         
         Index current = root;
-        Index parent;
         while(IS_NOT_LEAF(current)){
-            parent = current;
-
-            for(int i = 0; i< SIZE(current); ++i){
-                if(key < KEY(current, i)){
-                    current = CHILD(current, i);
-                    break;
-                }
-
-                if(i == (SIZE(current)-1)){
-                    current = CHILD(current, i + 1);
-                    break;
-                }
-
+            int i = 0;
+            for(; i< SIZE(current); ++i){
+                if(key < KEY(current, i)) break;
             }
+            current = CHILD(current, i);
         }
 
         int i = SIZE(current) - 1;
