@@ -7,9 +7,11 @@ int main() {
 
 
     // Read file
+    /*
     std::ifstream texto;
     texto.open("./output.txt");
 
+    
     int datos[ 1000000 ];
     int element;
     if (texto.is_open()) {
@@ -17,7 +19,7 @@ int main() {
         while (texto >> element) {
             datos[i++] = element;
         }
-    } 
+    } */
 
     int64_t tiempoInseccion = 0;
     for (int t=0; t<1; ++t){

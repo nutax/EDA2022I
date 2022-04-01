@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <queue>
 #include <iostream>
+#include <cstring>
 
 #define SIZE(i) mem[i].size
 #define KEY(i,j) mem[i].key[j]
@@ -92,7 +93,7 @@ class BplusTree{
         SIZE(current) = mid;
         Index other_half = NEW_NODE;
         SIZE(other_half) = degree - mid;
-        std::copy(&(KEY(current,mid)), &(KEY(current,capacity)), &(KEY(other_half,0)));
+        memcpy(&(KEY(other_half,0)), &(KEY(current,mid)), sizeof(Key)*(degree - mid));
         CHILD(other_half, 0) = null;
         PARENT(other_half) = PARENT(current);
         int dummy;
@@ -127,8 +128,8 @@ class BplusTree{
             SIZE(current) = mid;
             other_half = NEW_NODE;
             SIZE(other_half) = degree - mid;
-            std::copy(&(KEY(current,mid+1)), &(KEY(current,capacity)), &(KEY(other_half,0)));
-            std::copy(&(CHILD(current,mid+1)), &(CHILD(current,degree)), &(CHILD(other_half,0)));
+            memcpy(&(KEY(other_half,0)), &(KEY(current,mid+1)), sizeof(Key)*(degree - mid - 1));
+            memcpy(&(CHILD(other_half,0)), &(CHILD(current,mid+1)), sizeof(Index)*(degree - mid));
             PARENT(other_half) = PARENT(current);
         }while(true);
     }
