@@ -44,7 +44,7 @@ class BplusTree{
     public:
     BplusTree(){
         root = null;
-        mem.reserve(128);
+        mem.reserve(1024*128);
         mem.emplace_back();
     }
 
@@ -130,6 +130,8 @@ class BplusTree{
             memcpy(&(KEY(other_half,0)), &(KEY(current,mid+1)), sizeof(Key)*(degree - mid - 1));
             memcpy(&(CHILD(other_half,0)), &(CHILD(current,mid+1)), sizeof(Index)*(degree - mid));
             PARENT(other_half) = PARENT(current);
+            for(int j = 0; j<SIZE(other_half); ++j) PARENT(CHILD(other_half,j)) = other_half;
+            if(CHILD(other_half,SIZE(other_half)) != null) PARENT(CHILD(other_half,SIZE(other_half))) = other_half;
         }while(true);
     }
 
@@ -153,7 +155,9 @@ class BplusTree{
             std::cout<<std::endl;
             q.pop();
         }
+        std::cout<<std::endl;
     }
+    int nodes(){return mem.size();}
 };
 
 #endif
