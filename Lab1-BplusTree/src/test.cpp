@@ -16,9 +16,15 @@ int main() {
     b.insertar(20);
     b.insertar(28);
     b.insertar(42);
+    auto v = b.bfs();
+    for(auto& e : v) std::cout<<e<<' ';
+    
+    std::cout<<std::endl;
+
     b.insertar(2);
     b.insertar(3);
     b.insertar(0);
-    b.bfs();
+    v = b.bfs();
+    for(auto& e : v) std::cout<<e<<' ';
 }
 
