@@ -80,7 +80,7 @@ class BplusTree{
 
         int i = SIZE(current) - 1;
         SIZE(current) += 1;
-        while(i>= 0 && key > KEY(current, i)){
+        while(i>= 0 && key < KEY(current, i)){
             KEY(current, i + 1) = KEY(current, i);
             i -= 1;
         }
@@ -102,7 +102,7 @@ class BplusTree{
                 PARENT(current) = root;
                 PARENT(other_half) = root;
                 SIZE(root) = 1;
-                KEY(root, 0) = KEY(other_half, 0);
+                KEY(root, 0) = KEY(current, SIZE(current));
                 CHILD(root, 0) = current;
                 CHILD(root, 1) = other_half;
                 PARENT(root) = null;
@@ -114,7 +114,7 @@ class BplusTree{
             current = PARENT(current);
             int i = SIZE(current) - 1;
             SIZE(current) += 1;
-            while(i>= 0 && key > KEY(current, i)){
+            while(i>= 0 && key < KEY(current, i)){
                 KEY(current, i + 1) = KEY(current, i);
                 CHILD(current, i + 2) = CHILD(current, i+1);
                 i -= 1;
@@ -128,7 +128,7 @@ class BplusTree{
             other_half = NEW_NODE;
             SIZE(other_half) = degree - mid;
             std::copy(&(KEY(current,mid+1)), &(KEY(current,capacity)), &(KEY(other_half,0)));
-            std::copy(&(CHILD(current,mid+1)), &(CHILD(current,capacity)), &(CHILD(other_half,0)));
+            std::copy(&(CHILD(current,mid+1)), &(CHILD(current,degree)), &(CHILD(other_half,0)));
             PARENT(other_half) = PARENT(current);
         }while(true);
     }

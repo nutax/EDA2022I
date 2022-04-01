@@ -20,18 +20,19 @@ int main() {
     } 
 
     int64_t tiempoInseccion = 0;
-    for (int t=0; t<10; ++t){
+    for (int t=0; t<1; ++t){
         auto tree = BplusTree{};
         
         std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-        for (int i=0; i<10; ++i){
-            tree.insertar( datos[i] );
+        for (uint32_t i=1; i<11; ++i){
+            tree.insertar( i );
         }
         std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
         // Calcular tiempo
         auto tiempo = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
         tiempoInseccion += tiempo;
+        tree.bfs();
     }
     std::cout << tiempoInseccion << std::endl;
 }
