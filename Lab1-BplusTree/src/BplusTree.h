@@ -27,8 +27,8 @@ class BplusTree{
     
     struct Node{
         Size size;
-        Key key[degree];
-        Index child[degree];
+        Key key[capacity+1];
+        Index child[degree+1];
         Index parent;
     };
 
@@ -94,17 +94,35 @@ class BplusTree{
         CHILD(other_half, 0) = null;
         PARENT(other_half) = PARENT(current);
 
-        if(PARENT(current) == null){
+        if(current == root){
             root = NEW_NODE;
+            PARENT(current) = root;
+            PARENT(other_half) = root;
             SIZE(root) = 1;
             KEY(root, 0) = KEY(other_half, 0);
             CHILD(root, 0) = current;
             CHILD(root, 1) = other_half;
             PARENT(root) = null;
+            return;
         }
+        Index child = other_half;
+        do{
+            Key k = KEY(child, 0);
+            current = PARENT(current);
+            int i = SIZE(current) - 1;
+            SIZE(current) += 1;
+            while(i>= 0 && key > KEY(current, i)){
+                KEY(current, i + 1) = KEY(current, i);
+                CHILD(current, i + 2) = CHILD(current, i+1);
+                i -= 1;
+            }
+            KEY(current, i + 1) = key;
+            CHILD(current, i + 2) = child;
 
+            if(SIZE(current) <= capacity) return;
 
-        
+            
+        }while(true);
     }
 
 
