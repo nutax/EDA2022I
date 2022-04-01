@@ -94,20 +94,21 @@ class BplusTree{
         CHILD(other_half, 0) = null;
         PARENT(other_half) = PARENT(current);
 
-        if(current == root){
-            root = NEW_NODE;
-            PARENT(current) = root;
-            PARENT(other_half) = root;
-            SIZE(root) = 1;
-            KEY(root, 0) = KEY(other_half, 0);
-            CHILD(root, 0) = current;
-            CHILD(root, 1) = other_half;
-            PARENT(root) = null;
-            return;
-        }
-        Index child = other_half;
         do{
-            Key k = KEY(child, 0);
+            if(current == root){
+                root = NEW_NODE;
+                PARENT(current) = root;
+                PARENT(other_half) = root;
+                SIZE(root) = 1;
+                KEY(root, 0) = KEY(other_half, 0);
+                CHILD(root, 0) = current;
+                CHILD(root, 1) = other_half;
+                PARENT(root) = null;
+                return;
+            }
+        
+            Index child = other_half;
+            Key k = KEY(current, SIZE(current));
             current = PARENT(current);
             int i = SIZE(current) - 1;
             SIZE(current) += 1;
@@ -116,12 +117,17 @@ class BplusTree{
                 CHILD(current, i + 2) = CHILD(current, i+1);
                 i -= 1;
             }
-            KEY(current, i + 1) = key;
-            CHILD(current, i + 2) = child;
+            KEY(current, i + 1) = k;
+            CHILD(current, i + 2) = other_half;
 
             if(SIZE(current) <= capacity) return;
 
-            
+            SIZE(current) = mid;
+            other_half = NEW_NODE;
+            SIZE(other_half) = degree - mid;
+            std::copy(&(KEY(current,mid+1)), &(KEY(current,capacity)), &(KEY(other_half,0)));
+            std::copy(&(CHILD(current,mid+1)), &(CHILD(current,capacity)), &(CHILD(other_half,0)));
+            PARENT(other_half) = PARENT(current);
         }while(true);
     }
 
