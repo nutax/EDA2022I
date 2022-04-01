@@ -35,6 +35,7 @@ int main() {
         auto tiempo = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
         tiempoInseccion += tiempo;
     }
+    //auto v = tree.bfs();
     std::cout << tiempoInseccion << std::endl;
 
 }
