@@ -1,6 +1,8 @@
 #ifndef BPLUSTREE_H
 #define BPLUSTREE_H
 
+//Por José Ignacio Huby Ochoa
+
 #include <vector>
 #include <cstdint>
 #include <algorithm>
@@ -8,6 +10,7 @@
 #include <iostream>
 #include <cstring>
 
+//Macros para facilitar el uso de un vector como gestor de memoria
 #define SIZE(i) mem[i].size
 #define KEY(i,j) mem[i].key[j]
 #define CHILD(i,j) mem[i].child[j]
@@ -16,14 +19,13 @@
 #define IS_NOT_LEAF(i) (mem[i].child[0] != null)
 #define NEW_NODE mem.size(); mem.emplace_back()
 
-
 class BplusTree{
     using Key = uint32_t;
-    using Value = uint32_t;
-    using Index = uint32_t;
+    using Value = uint32_t; // No se usa, pero en la practica deberia haber un value
+    using Index = uint32_t;  // Sustituto de ptr, es el indice del vector
     using Size = uint32_t;
 
-    static constexpr Index null = 0;
+    static constexpr Index null = 0; //La posición 0 en el vector es dummy para permitir null = 0
     static constexpr Size degree = 21; //Muchisimo mas rapido con grado 6
     static constexpr Size capacity = degree-1;
     static constexpr Size mid = degree/2;
@@ -32,33 +34,33 @@ class BplusTree{
         Size size;
         Key key[capacity+1];
         Index child[degree+1] = {0};
-        uint32_t dummy[1];
+        uint32_t dummy[1]; //Mejora la performance con estos extras bytes
     };
 
 
-    Index root;
-    std::vector<Node> mem;
+    Index root; 
+    std::vector<Node> mem; //Toda la memoria dinámica que se usara
 
 
     public:
     BplusTree(){
         root = null;
-        mem.reserve(1024*128);
+        mem.reserve(1024*128); //Evitar allocaciones
         mem.emplace_back();
     }
 
     ~BplusTree(){}
 
     void insertar(Key const& key){
-        if(root == null){
+        if(root == null){ 
             root = NEW_NODE;
             SIZE(root) = 1;
             KEY(root, 0) = key;
             return;
-        }
+        } //Si no hay root
         
-        int level = 0;
-        Index parent[8];
+        int level = 0; //Head del stack
+        Index parent[12]; //Stack de parents
         Index current = root;
         while(IS_NOT_LEAF(current)){
             parent[level++] = current;
@@ -67,7 +69,7 @@ class BplusTree{
                 if(key < KEY(current, i)) break;
             }
             current = CHILD(current, i);
-        }
+        } //Encontrar nodo hoja y el camino de parents
 
         int i = SIZE(current) - 1;
         SIZE(current) += 1;
@@ -75,16 +77,16 @@ class BplusTree{
             KEY(current, i + 1) = KEY(current, i);
             i -= 1;
         }
-        KEY(current, i + 1) = key;
+        KEY(current, i + 1) = key; //Insertar el key
         
         
-        if(SIZE(current) <= capacity) return;
+        if(SIZE(current) <= capacity) return; //Si no hay overflow, termina
 
         SIZE(current) = mid;
         Index other_half = NEW_NODE;
         SIZE(other_half) = degree - mid;
         memcpy(&(KEY(other_half,0)), &(KEY(current,mid)), sizeof(Key)*(degree - mid));
-        
+                    //Se hace split y el centro se queda en el nodo hoja y tambien sube
         
         do{
             if(current == root){
@@ -96,11 +98,11 @@ class BplusTree{
                 CHILD(root, 1) = other_half;
                 
                 return;
-            }
+            } //Si es el root, se crear otro root y termina
         
             Index child = other_half;
-            Key k = KEY(current, SIZE(current));
-            current = parent[--level];
+            Key k = KEY(current, SIZE(current)); //Se obtiene la key que sube
+            current = parent[--level]; //Se atiende al padre
             int i = SIZE(current) - 1;
             SIZE(current) += 1;
             while(i>= 0 && key < KEY(current, i)){
@@ -109,16 +111,16 @@ class BplusTree{
                 i -= 1;
             }
             KEY(current, i + 1) = k;
-            CHILD(current, i + 2) = other_half;
+            CHILD(current, i + 2) = other_half; //Se inserta la key y el hijo
 
-            if(SIZE(current) <= capacity) return;
+            if(SIZE(current) <= capacity) return; //Si no hay overflow, termina
 
             SIZE(current) = mid;
             other_half = NEW_NODE;
             SIZE(other_half) = degree - mid - 1;
             memcpy(&(KEY(other_half,0)), &(KEY(current,mid+1)), sizeof(Key)*(degree - mid - 1));
             memcpy(&(CHILD(other_half,0)), &(CHILD(current,mid+1)), sizeof(Index)*(degree - mid));
-            
+                //Se hace split y el centro sube, pero no se queda en el nodo hijo 
         }while(true);
     }
 
