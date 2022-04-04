@@ -275,7 +275,7 @@ class BplusTree{
             i = ileft;
         }
         else if(iright <= SIZE(parent[level])){
-            sibling = CHILD(parent[level], ileft);
+            sibling = CHILD(parent[level], iright);
             for(int j = 0; j < SIZE(sibling); ++j){
                 KEY(current, SIZE(current) + j) = KEY(sibling, j);
             }
@@ -300,7 +300,7 @@ class BplusTree{
             
             int remove_child = 0;
             for(; remove_child <= SIZE(current); ++remove_child){
-                if(remove_child == deleted) break;
+                if(CHILD(current, remove_child) == deleted) break;
             }
             for(; remove_child < SIZE(current); ++remove_child){
                 CHILD(current, remove_child) =  CHILD(current, remove_child + 1);
@@ -313,9 +313,10 @@ class BplusTree{
             if(SIZE(current) >= min) break; //Si no hace underflow, termina
 
             
+            level -= 1;
             ileft = child[level] - 1;
             iright = child[level] + 1;
-            level -= 1;
+            
             if(ileft >= 0){
                 sibling = CHILD(parent[level], ileft);
                 if(CAN_GIVE(sibling)){
@@ -367,15 +368,15 @@ class BplusTree{
                 i = ileft;
             }
             else if(iright <= SIZE(parent[level])){
-                sibling = CHILD(parent[level], ileft);
+                sibling = CHILD(parent[level], iright);
                 KEY(current, SIZE(current)) = KEY(parent[level], iright - 1);
                 for(int j = 0; j < SIZE(sibling); ++j){
                     KEY(current, SIZE(current) + j + 1) = KEY(sibling, j);
                 }
-                for(int j = 0; j < (SIZE(current) + 1); ++j){
+                for(int j = 0; j < (SIZE(sibling) + 1); ++j){
                     CHILD(current, SIZE(current) + j + 1) = CHILD(sibling, j);
                 }
-                SIZE(current) += SIZE(sibling);
+                SIZE(current) += SIZE(sibling) + 1;
                 deleted = sibling;
                 i = iright - 1;
 
