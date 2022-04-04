@@ -341,7 +341,7 @@ class BplusTree{
                     KEY(current, SIZE(current)) = KEY(parent[level], iright - 1);
                     KEY(parent[level], iright - 1) = KEY(sibling, 0);
                     CHILD(current, SIZE(current) + 1) = CHILD(sibling, 0);
-                    CHILD(sibling, SIZE(sibling)) = null;
+                    CHILD(sibling, SIZE(sibling) + 1) = null;
                     SIZE(current) += 1;
                     SIZE(sibling) -= 1;
                     for(int j = 0; j < SIZE(sibling); ++j){
@@ -398,8 +398,8 @@ class BplusTree{
                 }
                 if(found) break;
                 internal = CHILD(internal, i);
-            } //Encontrar nodo hoja y el camino de parents
-            if(found) eraseInternal(internal, i);
+            } //Encontrar nodo interno
+            if(found) eraseInternal(internal, i); //Sustituirlo por el siguiente
         }
     }
 };
