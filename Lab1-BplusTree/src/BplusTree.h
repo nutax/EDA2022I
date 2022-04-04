@@ -28,7 +28,7 @@ class BplusTree{
     using Size = uint32_t;
 
     static constexpr Index null = 0; //La posición 0 en el vector es dummy para permitir null = 0
-    static constexpr Size degree = 4; //Más rapido con grado 6
+    static constexpr Size degree = 21; //Más rapido con grado 6
     static constexpr Size capacity = degree-1;
     static constexpr Size mid = degree/2;
     static constexpr Size min = (degree/2) + (degree%2) - 1;
