@@ -44,6 +44,13 @@ class BplusTree{
     Index root; 
     std::vector<Node> mem; //Toda la memoria dinámica que se usara
 
+    void eraseInternal(Index internal, int i){
+        Index current = CHILD(internal, i + 1);
+        while(IS_NOT_LEAF(current)){
+            current = CHILD(current, 0);
+        }
+        KEY(internal, i) = KEY(current, 0);
+    }
 
     public:
     BplusTree(){
@@ -155,16 +162,21 @@ class BplusTree{
     void borrar(Key const& key){
         if(root == null) return; //Si no hay root, termina
 
+        
         int i;
         int level = 0; //Head del stack
         int child[10]; //Stack de childs
         Index parent[10]; //Stack de parents
         Index current = root;
         Index internal = null;
+        int iinternal;
         while(IS_NOT_LEAF(current)){
             for(i = 0; i< SIZE(current); ++i){
                 if(key < KEY(current, i)) break;
-                else if(key == KEY(current, i)) internal = current;
+                else if(key == KEY(current, i)) {
+                    internal = current;
+                    iinternal = i;
+                }
             }
             child[level] = i;
             parent[level++] = current;
@@ -196,7 +208,12 @@ class BplusTree{
         } //Si solo esta el root, termina
 
 
-        if(internal == null && SIZE(current) >= min) return; // Si no hay copia interna y cumple el tamaño, termina 
+        if(SIZE(current) >= min) {
+            if(internal != null){
+                eraseInternal(internal, i);
+            }
+            return;
+        } // Si no hay copia interna y cumple el tamaño, termina 
 
 
         Index sibling;
@@ -219,7 +236,7 @@ class BplusTree{
                 KEY(current, SIZE(current)) = KEY(sibling, 0);
                 SIZE(current) += 1;
                 SIZE(sibling) -= 1;
-                for(int j = 0; j < SIZE(sibling); --j){
+                for(int j = 0; j < SIZE(sibling); ++j){
                     KEY(sibling, j) = KEY(sibling, j + 1);
                 }
                 KEY(parent[level], iright - 1) = KEY(sibling, 0);
@@ -230,7 +247,7 @@ class BplusTree{
         Index deleted;
         if(ileft >= 0){
             sibling = CHILD(parent[level], ileft);
-            for(int j = 0; j < SIZE(current); --j){
+            for(int j = 0; j < SIZE(current); ++j){
                 KEY(sibling, SIZE(sibling) + j) = KEY(current, j);
             }
             SIZE(sibling) += SIZE(current);
@@ -240,7 +257,7 @@ class BplusTree{
         }
         else if(iright <= SIZE(parent[level])){
             sibling = CHILD(parent[level], ileft);
-            for(int j = 0; j < SIZE(sibling); --j){
+            for(int j = 0; j < SIZE(sibling); ++j){
                 KEY(current, SIZE(current) + j) = KEY(sibling, j);
             }
             SIZE(current) += SIZE(sibling);
@@ -255,8 +272,8 @@ class BplusTree{
 
             if(current == root && SIZE(current) == 1){
                 root = (deleted == CHILD(current, 0)) ? CHILD(current, 1) : CHILD(current, 0);
-                return;
-            } // Si es root y tiene size 1, se cambia de root el hijo no eliminado
+                break;
+            } // Si es root y tiene size 1, se cambia de root al hijo no eliminado y termina
             
             for(int j = i; j< SIZE(current); ++j){
                 KEY(current, j) = KEY(current, j+1);
@@ -272,10 +289,11 @@ class BplusTree{
             CHILD(current, SIZE(current)) = null;
             SIZE(current) -= 1; //Se remueve el hijo eliminado
 
-            if(current == root) return; //Si es root, termina
+            if(current == root) break; //Si es root, termina
 
-            if(SIZE(current) >= min) return; //Si no hace underflow, termina
+            if(SIZE(current) >= min) break; //Si no hace underflow, termina
 
+            
             ileft = child[level] - 1;
             iright = child[level] + 1;
             level -= 1;
@@ -285,61 +303,80 @@ class BplusTree{
                     for(int j = SIZE(current); j > 0; --j){
                         KEY(current, j) = KEY(current, j - 1);
                     }
-                    KEY(current, 0) = KEY(parent[level], ileft);
-                    KEY(parent[level], ileft) = KEY(sibling, SIZE(sibling) - 1);
                     for(int j = SIZE(current) + 1; j > 0; --j){
                         CHILD(current, j) = CHILD(current, j - 1);
                     }
-                    
+                    KEY(current, 0) = KEY(parent[level], ileft);
+                    KEY(parent[level], ileft) = KEY(sibling, SIZE(sibling) - 1);
+                    CHILD(current, 0) = CHILD(sibling, SIZE(sibling));
+                    CHILD(sibling, SIZE(sibling)) = null;
                     SIZE(current) += 1;
                     SIZE(sibling) -= 1;
-                    return;
+                    break;
                 }
             }
             if(iright <= SIZE(parent[level])){
                 sibling = CHILD(parent[level], iright);
                 if(CAN_GIVE(sibling)){
-                    KEY(current, SIZE(current)) = KEY(sibling, 0);
+                    KEY(current, SIZE(current)) = KEY(parent[level], iright - 1);
+                    KEY(parent[level], iright - 1) = KEY(sibling, 0);
+                    CHILD(current, SIZE(current) + 1) = CHILD(sibling, 0);
+                    CHILD(sibling, SIZE(sibling)) = null;
                     SIZE(current) += 1;
                     SIZE(sibling) -= 1;
-                    for(int j = 0; j < SIZE(sibling); --j){
+                    for(int j = 0; j < SIZE(sibling); ++j){
                         KEY(sibling, j) = KEY(sibling, j + 1);
                     }
-                    KEY(parent[level], iright - 1) = KEY(sibling, 0);
-                    return;
+                    for(int j = 0; j <= SIZE(sibling); ++j){
+                        CHILD(sibling, j) = CHILD(sibling, j + 1);
+                    }
+                    break;
                 }
-            } //Si algun hermano puede prestar, presta, arregla al padre y termina
+            } //Si algun hermano puede prestar, el padre presta al actual, aquel al padre, y termina
 
             if(ileft >= 0){
                 sibling = CHILD(parent[level], ileft);
-                for(int j = 0; j < SIZE(current); --j){
-                    KEY(sibling, SIZE(sibling) + j) = KEY(current, j);
+                KEY(sibling, SIZE(sibling)) = KEY(parent[level], ileft);
+                for(int j = 0; j < SIZE(current); ++j){
+                    KEY(sibling, SIZE(sibling) + j + 1) = KEY(current, j);
                 }
-                SIZE(sibling) += SIZE(current);
-                NEXT(sibling) = NEXT(current);
+                for(int j = 0; j < (SIZE(current) + 1); ++j){
+                    CHILD(sibling, SIZE(sibling) + j + 1) = CHILD(current, j);
+                }
+                SIZE(sibling) += SIZE(current) + 1;
                 deleted = current;
                 i = ileft;
             }
             else if(iright <= SIZE(parent[level])){
                 sibling = CHILD(parent[level], ileft);
-                for(int j = 0; j < SIZE(sibling); --j){
-                    KEY(current, SIZE(current) + j) = KEY(sibling, j);
+                KEY(current, SIZE(current)) = KEY(parent[level], iright - 1);
+                for(int j = 0; j < SIZE(sibling); ++j){
+                    KEY(current, SIZE(current) + j + 1) = KEY(sibling, j);
+                }
+                for(int j = 0; j < (SIZE(current) + 1); ++j){
+                    CHILD(current, SIZE(current) + j + 1) = CHILD(sibling, j);
                 }
                 SIZE(current) += SIZE(sibling);
-                NEXT(current) = NEXT(sibling);
                 deleted = sibling;
                 i = iright - 1;
 
             } //Si existe algun hermano y ninguno puede prestar, se juntan
 
         }while(true);
-        
 
-
-
-
-        
-
+        if(internal != null){
+            internal = root;
+            bool found = false;
+            while(true){
+                for(i = 0; i< SIZE(internal); ++i){
+                    if(key < KEY(internal, i)) break;
+                    else if(key == KEY(internal, i)) found = true;
+                }
+                if(found) break;
+                internal = CHILD(internal, i);
+            } //Encontrar nodo hoja y el camino de parents
+            eraseInternal(internal, i);
+        }
     }
 };
 
