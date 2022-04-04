@@ -28,7 +28,7 @@ class BplusTree{
     using Size = uint32_t;
 
     static constexpr Index null = 0; //La posición 0 en el vector es dummy para permitir null = 0
-    static constexpr Size degree = 21; //Más rapido con grado 6
+    static constexpr Size degree = 4; //Más rapido con grado 6
     static constexpr Size capacity = degree-1;
     static constexpr Size mid = degree/2;
     static constexpr Size min = (degree/2) + (degree%2) - 1;
@@ -172,6 +172,7 @@ class BplusTree{
             std::cout << std::endl;
             q.pop();
         }
+        std::cout << std::endl;
     }
 
     int nodes(){return mem.size();}
@@ -201,7 +202,7 @@ class BplusTree{
             current = CHILD(current, i);
         } //Encontrar nodo hoja y el camino de parents
 
-        
+        level -= 1;
         int ileft = i - 1;
         int iright = i + 1;
 
@@ -241,9 +242,9 @@ class BplusTree{
                 for(int j = SIZE(current); j > 0; --j){
                     KEY(current, j) = KEY(current, j - 1);
                 }
-                KEY(current, 0) = KEY(sibling, SIZE(sibling));
                 SIZE(current) += 1;
                 SIZE(sibling) -= 1;
+                KEY(current, 0) = KEY(sibling, SIZE(sibling));
                 KEY(parent[level], ileft) = KEY(current, 0);
                 goto check_internal;
             }
