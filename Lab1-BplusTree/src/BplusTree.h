@@ -156,6 +156,24 @@ class BplusTree{
         return result;
     }
 
+    void print(){
+        if(root == null) return;
+        std::queue<Index> q;
+        q.push(root);
+        while(!q.empty()){
+            const Index current = q.front();
+            if(CHILD(current, 0) != null)
+            for(int i = 0; i<(SIZE(current)+1); ++i){
+                if(CHILD(current, i) != null) q.push(CHILD(current, i));
+            }
+            for(int i = 0; i<SIZE(current); ++i){
+                std::cout << KEY(current, i) << ' ';
+            }
+            std::cout << std::endl;
+            q.pop();
+        }
+    }
+
     int nodes(){return mem.size();}
 
 
@@ -203,17 +221,17 @@ class BplusTree{
         
 
         if(current == root){
-            if(SIZE(root) == 0) root = null; //Si el root está vacio, libera memoria
+            if(SIZE(root) == 0) root = null; //Si el root está vacio, volver null
             return;
         } //Si solo esta el root, termina
 
 
         if(SIZE(current) >= min) {
             if(internal != null){
-                eraseInternal(internal, i);
-            }
+                eraseInternal(internal, iinternal);
+            } // Si existe una copia interna
             return;
-        } // Si no hay copia interna y cumple el tamaño, termina 
+        } // Si no hay underflow, termina 
 
 
         Index sibling;
@@ -227,7 +245,7 @@ class BplusTree{
                 SIZE(current) += 1;
                 SIZE(sibling) -= 1;
                 KEY(parent[level], ileft) = KEY(current, 0);
-                return;
+                goto check_internal;
             }
         }
         if(iright <= SIZE(parent[level])){
@@ -240,7 +258,7 @@ class BplusTree{
                     KEY(sibling, j) = KEY(sibling, j + 1);
                 }
                 KEY(parent[level], iright - 1) = KEY(sibling, 0);
-                return;
+                goto check_internal;
             }
         } //Si algun hermano puede prestar, presta, arregla al padre y termina
 
@@ -364,18 +382,22 @@ class BplusTree{
 
         }while(true);
 
+        check_internal:
         if(internal != null){
             internal = root;
             bool found = false;
-            while(true){
+            while(IS_NOT_LEAF(internal)){
                 for(i = 0; i< SIZE(internal); ++i){
                     if(key < KEY(internal, i)) break;
-                    else if(key == KEY(internal, i)) found = true;
+                    else if(key == KEY(internal, i)) {
+                        found = true;
+                        break;
+                    }
                 }
                 if(found) break;
                 internal = CHILD(internal, i);
             } //Encontrar nodo hoja y el camino de parents
-            eraseInternal(internal, i);
+            if(found) eraseInternal(internal, i);
         }
     }
 };
